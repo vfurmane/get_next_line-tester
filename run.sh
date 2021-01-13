@@ -20,6 +20,8 @@
 # cd to the script's directory
 cd "$(dirname "$0")"
 
+# List of buffer sizes
+buff_sizes=(32 1 100 9999 10000000)
 # List of every test files
 tests=()
 
@@ -31,43 +33,46 @@ source scripts/put.sh
 source scripts/args.sh
 
 make fclean > /dev/null 2>&1
-info "Compiling the test scripts..."
-make all > /dev/null 2>&1 || error "Error when compiling the tests."
 texts=$(find test/texts -name "*.txt" -exec sh -c "basename {} | sed 's/.txt$//'" \; | sort)
 
 # Create the directory for test scripts and logs
 mkdir -p logs/basic
 
 info "--------[ basic ]--------"
-for text in ${texts[@]}
+for size in ${buff_sizes[@]}
 do
-	# Check that the script exists or not
-	if ls outs/texts/$text.txt > /dev/null 2>&1
-	then
-		# Execute the test program and write the logs into a dedicated file
-		c=$(tail -c 1 outs/texts/$text.txt)
-		if [ "$c" != "" ]
+	info "BUFFER_SIZE = $size"
+	for text in ${texts[@]}
+	do
+		make all BUFF_SIZE=$size > /dev/null 2>&1 || error "Error when compiling the tests."
+		# Check that the script exists or not
+		if ls outs/texts/$text.txt > /dev/null 2>&1
 		then
-			./outs/basic_test.out outs/texts/$text.txt -n > logs/basic/$text.log
+			# Execute the test program and write the logs into a dedicated file
+			c=$(tail -c 1 outs/texts/$text.txt)
+			if [ "$c" != "" ]
+			then
+				./outs/basic_test.out outs/texts/$text.txt -n > logs/basic/$text.log
+			else
+				./outs/basic_test.out outs/texts/$text.txt > logs/basic/$text.log
+			fi
+			# Display OK or KO according to the diff returned value
+			diff outs/texts/$text.txt logs/basic/$text.log
+			if [ $? -eq 0 ]
+			then
+				ret_msg=$'\033[32mOK\033[0m'
+				printf "%-20s [%s]\n" $text $ret_msg
+			else
+				ret_msg=$'\033[31mKO\033[0m'
+				printf "%-20s [%s]\n" $text $ret_msg
+			fi
 		else
-			./outs/basic_test.out outs/texts/$text.txt > logs/basic/$text.log
+			warn "Text file for $text doesn't exist."
 		fi
-		# Display OK or KO according to the diff returned value
-		diff outs/texts/$text.txt logs/basic/$text.log
-		if [ $? -eq 0 ]
-		then
-			ret_msg=$'\033[32mOK\033[0m'
-			printf "%-20s [%s]\n" $text $ret_msg
-		else
-			ret_msg=$'\033[31mKO\033[0m'
-			printf "%-20s [%s]\n" $text $ret_msg
-		fi
-	else
-		warn "Text file for $text doesn't exist."
-	fi
+	done
+	make eclean > /dev/null 2>&1
 done
 
-make eclean > /dev/null 2>&1
 
 # Create the directory for test scripts and logs
 mkdir -p logs/leaks
