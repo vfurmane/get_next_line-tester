@@ -6,7 +6,7 @@
 #    By: vfurmane <vfurmane@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/13 10:32:22 by vfurmane          #+#    #+#              #
-#    Updated: 2021/01/13 18:26:06 by vfurmane         ###   ########.fr        #
+#    Updated: 2021/01/13 19:30:30 by vfurmane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,8 @@ INCL		= test/includes
 GNL			= ../get_next_line
 CC			= clang
 CFLAGS		= -Wall -Wextra -Werror
+FSAN		=
+BUFF_SIZE	= 32
 CP			= cp -f
 RM			= rm -f
 MKDIR		= mkdir -p
@@ -28,7 +30,7 @@ MKDIR		= mkdir -p
 
 outs/%.out:	test/srcs/%.o
 			$(MKDIR) outs
-			$(CC) $(CFLAGS) -D BUFFER_SIZE=10000 $< $(GNL)/get_next_line*.c $(ASSETS_OBJ) -o $@
+			$(CC) $(CFLAGS) $(FSAN) -D BUFFER_SIZE=$(BUFF_SIZE) $< $(GNL)/get_next_line*.c $(ASSETS_OBJ) -o $@
 
 all:		$(ASSETS_OBJ) $(EXEC)
 			$(CP) -r test/texts outs
@@ -37,8 +39,11 @@ clean:
 			$(RM) $(OBJS)
 			$(RM) $(ASSETS_OBJ)
 
-fclean:		clean
-			$(RM) -r logs outs
+eclean:		clean
+			$(RM) -r outs
+
+fclean:		eclean clean
+			$(RM) -r logs
 
 re:			fclean all
 

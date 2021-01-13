@@ -30,12 +30,13 @@ source scripts/put.sh
 # Parse arguments
 source scripts/args.sh
 
+make fclean > /dev/null 2>&1
 info "Compiling the test scripts..."
 make all > /dev/null 2>&1 || error "Error when compiling the tests."
 texts=$(find test/texts -name "*.txt" -exec sh -c "basename {} | sed 's/.txt$//'" \; | sort)
 
 # Create the directory for test scripts and logs
-mkdir -p logs
+mkdir -p logs/basic
 
 info "--------[ basic ]--------"
 for text in ${texts[@]}
@@ -47,12 +48,47 @@ do
 		c=$(tail -c 1 outs/texts/$text.txt)
 		if [ "$c" != "" ]
 		then
-			./outs/basic_test.out outs/texts/$text.txt -n > logs/$text.log
+			./outs/basic_test.out outs/texts/$text.txt -n > logs/basic/$text.log
 		else
-			./outs/basic_test.out outs/texts/$text.txt > logs/$text.log
+			./outs/basic_test.out outs/texts/$text.txt > logs/basic/$text.log
 		fi
 		# Display OK or KO according to the diff returned value
-		diff outs/texts/$text.txt logs/$text.log
+		diff outs/texts/$text.txt logs/basic/$text.log
+		if [ $? -eq 0 ]
+		then
+			ret_msg=$'\033[32mOK\033[0m'
+			printf "%-20s [%s]\n" $text $ret_msg
+		else
+			ret_msg=$'\033[31mKO\033[0m'
+			printf "%-20s [%s]\n" $text $ret_msg
+		fi
+	else
+		warn "Text file for $text doesn't exist."
+	fi
+done
+
+make eclean > /dev/null 2>&1
+
+# Create the directory for test scripts and logs
+mkdir -p logs/leaks
+
+info "--------[ leaks ]--------"
+make all FSAN="-g3 -fsanitize=address" > /dev/null 2>&1 || error "Error when compiling the tests."
+for text in ${texts[@]}
+do
+	# Check that the script exists or not
+	if ls outs/texts/$text.txt > /dev/null 2>&1
+	then
+		# Execute the test program and write the logs into a dedicated file
+		c=$(tail -c 1 outs/texts/$text.txt)
+		if [ "$c" != "" ]
+		then
+			./outs/basic_test.out outs/texts/$text.txt -n > logs/leaks/$text.log 2>&1
+		else
+			./outs/basic_test.out outs/texts/$text.txt > logs/leaks/$text.log 2>&1
+		fi
+		# Display OK or KO according to the diff returned value
+		diff outs/texts/$text.txt logs/leaks/$text.log > /dev/null
 		if [ $? -eq 0 ]
 		then
 			ret_msg=$'\033[32mOK\033[0m'
