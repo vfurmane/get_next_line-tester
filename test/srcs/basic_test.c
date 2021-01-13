@@ -6,19 +6,21 @@
 /*   By: vfurmane <vfurmane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 10:19:44 by vfurmane          #+#    #+#             */
-/*   Updated: 2021/01/13 15:54:09 by vfurmane         ###   ########.fr       */
+/*   Updated: 2021/01/13 17:25:16 by vfurmane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tests.h"
 
-int	main(void)
+int	main(int argc, char **argv)
 {
 	int		fd;
 	int		ret;
 	char	*line;
 
-	if ((fd = open("outs/texts/buldozer2.txt", O_RDONLY)) == -1)
+	if (argc != 2)
+		return (ft_error("Please specify one file to open..."));
+	if ((fd = open(argv[1], O_RDONLY)) == -1)
 		return (ft_error("Cannot open the file for reading... Run this script from the root of the tester"));
 	while ((ret = get_next_line(fd, &line)))
 	{
