@@ -6,7 +6,7 @@
 #    By: vfurmane <vfurmane@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/13 10:32:22 by vfurmane          #+#    #+#              #
-#    Updated: 2021/01/13 17:27:58 by vfurmane         ###   ########.fr        #
+#    Updated: 2021/01/13 18:26:06 by vfurmane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,7 @@ clean:
 			$(RM) $(ASSETS_OBJ)
 
 fclean:		clean
-			$(RM) -r outs
+			$(RM) -r logs outs
 
 re:			fclean all
 
