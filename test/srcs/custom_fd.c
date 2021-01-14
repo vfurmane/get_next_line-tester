@@ -6,7 +6,7 @@
 /*   By: vfurmane <vfurmane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 10:19:44 by vfurmane          #+#    #+#             */
-/*   Updated: 2021/01/14 10:10:24 by vfurmane         ###   ########.fr       */
+/*   Updated: 2021/01/14 14:39:55 by vfurmane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,6 @@ int	main(int argc, char **argv)
 			printf("%s\n", line);
 		free(line);
 	}
+	free(line);
 	return (0);
 }
