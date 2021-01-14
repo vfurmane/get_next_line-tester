@@ -87,7 +87,12 @@ do
 	fd=${fds[$i]}
 	ret=${fd_return[$i]}
 	make all > /dev/null 2>&1 || error "Error when compiling the tests."
-	./outs/custom_fd.out $fd > logs/custom_fd/fd_$fd.log 2>&1
+	if [ $fd -eq 0 ]
+	then
+		./outs/custom_fd.out $fd && ./outs/custom_fd.out $fd > logs/custom_fd/fd_$fd.log 2>&1
+	else
+		./outs/custom_fd.out $fd > logs/custom_fd/fd_$fd.log 2>&1
+	fi
 	if [ $? -eq $ret ]
 	then
 		ret_msg=$'\033[32mOK\033[0m'
