@@ -24,6 +24,10 @@ cd "$(dirname "$0")"
 buff_sizes=(32 1 100 9999 10000000)
 # List of every test files
 tests=()
+# List of fds
+fds=(0 3 -1)
+# List of expected return
+fd_return=(0 1 1)
 
 # Intro message
 source scripts/intro.sh
@@ -70,6 +74,28 @@ do
 			warn "Text file for $text doesn't exist."
 		fi
 	done
+	make eclean > /dev/null 2>&1
+done
+
+# Create the directory for test scripts and logs
+mkdir -p logs/custom_fd
+
+info "-------[ custom_fd ]-------"
+info "You need to type text... (Ctrl + D to end)"
+for i in ${!fds[@]}
+do
+	fd=${fds[$i]}
+	ret=${fd_return[$i]}
+	make all > /dev/null 2>&1 || error "Error when compiling the tests."
+	./outs/custom_fd.out $fd > logs/custom_fd/fd_$fd.log 2>&1
+	if [ $? -eq $ret ]
+	then
+		ret_msg=$'\033[32mOK\033[0m'
+		printf "%-20s [%s]\n" $fd $ret_msg
+	else
+		ret_msg=$'\033[31mKO\033[0m'
+		printf "%-20s [%s]\n" $fd $ret_msg
+	fi
 	make eclean > /dev/null 2>&1
 done
 

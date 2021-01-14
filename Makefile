@@ -6,11 +6,11 @@
 #    By: vfurmane <vfurmane@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/13 10:32:22 by vfurmane          #+#    #+#              #
-#    Updated: 2021/01/13 19:30:30 by vfurmane         ###   ########.fr        #
+#    Updated: 2021/01/14 10:09:16 by vfurmane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		= $(addprefix test/srcs/, basic_test.c)
+SRCS		= $(addprefix test/srcs/, basic_test.c custom_fd.c)
 OBJS		= $(SRCS:.c=.o)
 EXEC		= $(patsubst test/srcs/%, outs/%, $(OBJS:.o=.out))
 ASSETS		= test/assets.c
