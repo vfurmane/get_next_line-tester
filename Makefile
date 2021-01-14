@@ -6,17 +6,19 @@
 #    By: vfurmane <vfurmane@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/13 10:32:22 by vfurmane          #+#    #+#              #
-#    Updated: 2021/01/14 10:09:16 by vfurmane         ###   ########.fr        #
+#    Updated: 2021/01/14 17:40:45 by vfurmane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		= $(addprefix test/srcs/, basic_test.c custom_fd.c)
+SRCS		= $(addprefix test/srcs/, basic_test.c custom_fd.c multi_fd.c)
 OBJS		= $(SRCS:.c=.o)
 EXEC		= $(patsubst test/srcs/%, outs/%, $(OBJS:.o=.out))
 ASSETS		= test/assets.c
 ASSETS_OBJ	= $(ASSETS:.c=.o)
 INCL		= test/includes
 GNL			= ../get_next_line
+GNL_SRCS	= $(GNL)/get_next_line.c $(GNL)/get_next_line_utils.c
+GNL_BONSRCS	= $(GNL)/get_next_line_bonus.c $(GNL)/get_next_line_utils_bonus.c
 CC			= clang
 CFLAGS		= -Wall -Wextra -Werror
 FSAN		=
@@ -30,10 +32,13 @@ MKDIR		= mkdir -p
 
 outs/%.out:	test/srcs/%.o
 			$(MKDIR) outs
-			$(CC) $(CFLAGS) $(FSAN) -D BUFFER_SIZE=$(BUFF_SIZE) $< $(GNL)/get_next_line*.c $(ASSETS_OBJ) -o $@
+			$(CC) $(CFLAGS) $(FSAN) -D BUFFER_SIZE=$(BUFF_SIZE) $< $(GNL_SRCS) $(ASSETS_OBJ) -o $@
 
 all:		$(ASSETS_OBJ) $(EXEC)
 			$(CP) -r test/texts outs
+
+bonus:		GNL_SRCS=$(GNL_BONSRCS)
+bonus:		all
 
 clean:
 			$(RM) $(OBJS)
@@ -47,5 +52,5 @@ fclean:		eclean clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:		all bonus clean fclean re
 .SECONDARY:	$(OBJS)

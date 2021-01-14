@@ -20,6 +20,9 @@
 # cd to the script's directory
 cd "$(dirname "$0")"
 
+# Bonus tests
+BONUS=0
+
 # List of buffer sizes
 buff_sizes=(32 1 100 9999 10000000)
 # List of every test files
@@ -104,7 +107,6 @@ do
 	make eclean > /dev/null 2>&1
 done
 
-
 # Create the directory for test scripts and logs
 mkdir -p logs/leaks
 
@@ -137,5 +139,27 @@ do
 		warn "Text file for $text doesn't exist."
 	fi
 done
+
+# Create the directory for test scripts and logs
+mkdir -p logs/bonus
+
+if [ $BONUS -eq 1 ]
+then	
+	info "--------[ bonus ]--------"
+	make eclean bonus > /dev/null 2>&1 || error "Error when compiling the bonus tests."
+	# Check that the script exists or not
+	# Execute the test program and write the logs into a dedicated file
+	./outs/multi_fd.out outs/texts/buldozer2.txt outs/texts/deepthought.txt > logs/bonus/merged.log 2>&1
+	# Display OK or KO according to the diff returned value
+	diff outs/texts/merged.txt logs/bonus/merged.log > /dev/null
+	if [ $? -eq 0 ]
+	then
+		ret_msg=$'\033[32mOK\033[0m'
+		printf "%-20s [%s]\n" $text $ret_msg
+	else
+		ret_msg=$'\033[31mKO\033[0m'
+		printf "%-20s [%s]\n" $text $ret_msg
+	fi
+fi
 
 make clean > /dev/null 2>&1
