@@ -49,6 +49,7 @@ info "--------[ basic ]--------"
 for size in ${buff_sizes[@]}
 do
 	info "BUFFER_SIZE = $size"
+	mkdir -p logs/basic/size$size
 	for text in ${texts[@]}
 	do
 		make all BUFF_SIZE=$size > /dev/null 2>&1 || error "Error when compiling the tests."
@@ -59,12 +60,12 @@ do
 			c=$(tail -c 1 outs/texts/$text.txt)
 			if [ "$c" != "" ]
 			then
-				./outs/basic_test.out outs/texts/$text.txt -n > logs/basic/$text.log
+				./outs/basic_test.out outs/texts/$text.txt -n > logs/basic/size$size/$text.log
 			else
-				./outs/basic_test.out outs/texts/$text.txt > logs/basic/$text.log
+				./outs/basic_test.out outs/texts/$text.txt > logs/basic/size$size/$text.log
 			fi
 			# Display OK or KO according to the diff returned value
-			diff outs/texts/$text.txt logs/basic/$text.log
+			diff outs/texts/$text.txt logs/basic/size$size/$text.log
 			if [ $? -eq 0 ]
 			then
 				ret_msg=$'\033[32mOK\033[0m'
